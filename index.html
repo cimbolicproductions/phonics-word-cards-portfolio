@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf7ee">
+  <meta name="description" content="Sound out words, flip to see their pictures, and build sentences with Phonics Word Cards.">
+  <title>Phonics Word Cards</title>
+  <link rel="stylesheet" href="./styles.css?v=kokoro-3">
+  <script type="module" src="./app.js?v=kokoro-3"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="./" aria-label="Phonics Word Cards home">
+        <span class="brand-mark" aria-hidden="true"><span>a</span></span>
+        <span>Phonics <strong>Word Cards</strong></span>
+      </a>
+      <nav class="mode-switch" aria-label="Activity">
+        <button id="cards-mode" type="button" aria-pressed="true">Word cards</button>
+        <button id="sentence-mode" type="button" aria-pressed="false">Build a sentence</button>
+      </nav>
+    </div>
+  </header>
+  <main class="shell">
+    <div class="intro">
+      <div>
+        <h1 id="page-title">Sound it out</h1>
+        <p id="page-description">Choose a card, then press Hear the word to sound it out.</p>
+      </div>
+      <button id="stop-speech" class="button secondary" type="button" hidden>■ <span>Stop audio</span></button>
+    </div>
+    <fieldset class="levels">
+      <legend>Choose a level</legend>
+      <div id="level-options" class="level-options"></div>
+    </fieldset>
+    <section id="cards-view" class="cards-layout" aria-label="Word cards">
+      <div class="card-panel">
+        <div class="card-stage" id="card-stage"></div>
+        <div class="card-actions">
+          <button id="play-word" class="button primary" type="button"><span aria-hidden="true">▶</span> Hear the word</button>
+          <button id="flip-card" class="button secondary" type="button"><span aria-hidden="true">↻</span> Flip card</button>
+          <button id="anchor-card" class="button quiet" type="button">Use in a sentence <span aria-hidden="true">↗</span></button>
+        </div>
+        <p id="speech-feedback" class="speech-feedback" role="status"></p>
+      </div>
+      <aside class="word-picker" aria-labelledby="word-picker-title">
+        <div class="picker-heading">
+          <h2 id="word-picker-title">Pick a word</h2>
+          <span id="word-count" class="word-count"></span>
+        </div>
+        <div id="word-options" class="word-groups">
+          <section class="word-group" aria-labelledby="naming-options-title">
+            <h3 id="naming-options-title">Naming words</h3>
+            <div id="naming-options" class="word-options"></div>
+          </section>
+          <section id="action-options-group" class="word-group action-group" aria-labelledby="action-options-title">
+            <h3 id="action-options-title">Action words</h3>
+            <div id="action-options" class="word-options"></div>
+          </section>
+        </div>
+        <div class="picker-nav">
+          <button id="previous-word" class="button secondary" type="button"><span aria-hidden="true">←</span> Previous</button>
+          <button id="next-word" class="button secondary" type="button">Next <span aria-hidden="true">→</span></button>
+        </div>
+      </aside>
+    </section>
+    <section id="sentence-view" class="sentence-layout" aria-labelledby="sentence-title" hidden>
+      <div class="sentence-panel">
+        <div class="picker-heading">
+          <h2 id="sentence-title">Your sentence</h2>
+          <button id="clear-sentence" class="button quiet" type="button" disabled>Start over</button>
+        </div>
+        <div id="sentence-strip" class="sentence-strip" aria-label="Sentence strip"></div>
+        <p id="sentence-help" class="sentence-help">Choose a word, then press Hear the word.</p>
+        <div id="sentence-edit" class="sentence-edit" hidden>
+          <button id="earlier-word" class="button secondary" type="button">← Move left</button>
+          <button id="later-word" class="button secondary" type="button">Move right →</button>
+          <button id="remove-word" class="button secondary" type="button">Remove</button>
+          <button id="cancel-swap" class="button quiet" type="button">Done</button>
+        </div>
+        <div class="sentence-actions">
+          <button id="play-sentence" class="button primary" type="button" disabled><span aria-hidden="true">▶</span> Play sentence</button>
+          <button id="play-sentence-word" class="button secondary" type="button" disabled>Hear the word</button>
+          <button id="undo-sentence" class="button quiet" type="button" disabled>Undo</button>
+          <span id="celebration" class="celebration" aria-hidden="true">✦ ✧ ✦</span>
+        </div>
+        <p id="sentence-voice-feedback" class="speech-feedback" role="status"></p>
+      </div>
+      <aside class="word-picker" aria-labelledby="sentence-palette-title">
+        <div class="picker-heading"><h2 id="sentence-palette-title">Add a word</h2></div>
+        <p class="palette-help">Tap to add or drag to the strip.</p>
+        <div id="sentence-word-groups" class="word-groups">
+          <section class="word-group action-group" aria-labelledby="action-palette-title">
+            <h3 id="action-palette-title">Action words</h3>
+            <div id="action-palette" class="word-options"></div>
+          </section>
+          <section class="word-group" aria-labelledby="word-palette-title">
+            <h3 id="word-palette-title">Naming words</h3>
+            <div id="word-palette" class="word-options"></div>
+          </section>
+          <section class="word-group" aria-labelledby="helper-palette-title">
+            <h3 id="helper-palette-title">Sentence helpers</h3>
+            <div id="helper-palette" class="word-options"></div>
+          </section>
+        </div>
+      </aside>
+    </section>
+    <p id="sentence-status" class="visually-hidden" role="status"></p>
+  </main>
+  <footer class="shell app-footer"><a href="./photo-credits.html">Photo credits</a></footer>
+</body>
+</html>
