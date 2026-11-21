@@ -98,7 +98,7 @@ export function createSpeechPlayer({ onBusy, onMessage, onHighlight }) {
     });
   }
 
-  async function play(steps) {
+  async function play(steps, errorMessage = 'Audio stopped. Tap the word or sentence to try again.') {
     stop();
     const playback = new AbortController();
     current = playback;
@@ -146,7 +146,7 @@ export function createSpeechPlayer({ onBusy, onMessage, onHighlight }) {
       if (!signal.aborted) {
         onMessage(preparingVoice
           ? 'The sentence voice could not load. Tap Play sentence to try again.'
-          : 'Audio stopped. Tap the word or sentence to try again.');
+          : errorMessage);
       }
       return false;
     } finally {

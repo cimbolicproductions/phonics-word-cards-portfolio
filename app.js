@@ -1,5 +1,6 @@
 import { levels, helpers } from './words.js?v=kokoro-3';
 import { createSpeechPlayer, decodeSteps, wholeWordStep } from './speech.js?v=kokoro-3';
+import { stories, storyTokens, storyReadingSteps } from './stories.js';
 
 const element = id => document.getElementById(id);
 const levelOptions = element('level-options');
@@ -16,10 +17,12 @@ const celebration = element('celebration');
 const stopSpeech = element('stop-speech');
 const speechFeedback = element('speech-feedback');
 const sentenceVoiceFeedback = element('sentence-voice-feedback');
+const storyFeedback = element('story-feedback');
 
 let levelIndex = 0;
 let wordIndex = 0;
 let mode = 'cards';
+let storyIndex = 0;
 let sentence = [];
 let previousSentence = null;
 let nextToken = 0;
@@ -29,11 +32,18 @@ let highlighted = [];
 
 const level = () => levels[levelIndex];
 const word = () => level().words[wordIndex];
+const levelStories = () => stories.filter(story => story.level === levelIndex);
+const story = () => levelStories()[storyIndex];
 const audio = createSpeechPlayer({
-  onBusy: busy => { stopSpeech.hidden = !busy; },
+  onBusy(busy) {
+    stopSpeech.hidden = !busy;
+    element('read-story').disabled = busy;
+    element('stop-story').hidden = !busy;
+  },
   onMessage(message) {
     speechFeedback.textContent = mode === 'cards' ? message : '';
     sentenceVoiceFeedback.textContent = mode === 'sentence' ? message : '';
+    storyFeedback.textContent = mode === 'stories' ? message : '';
   },
   onHighlight(step) {
     for (const node of highlighted) node.classList.remove('speaking');
@@ -50,6 +60,13 @@ const audio = createSpeechPlayer({
       : document.querySelectorAll('[data-speech-target="' + step.target + '"] ' + selector);
     highlighted = Array.from(targets);
     for (const node of highlighted) node.classList.add('speaking');
+    if (mode === 'stories' && highlighted.length) {
+      const active = highlighted[0];
+      const bounds = active.getBoundingClientRect();
+      if (bounds.bottom > window.innerHeight - 65 || bounds.top < 65) {
+        active.scrollIntoView({ block: 'center', behavior: 'instant' });
+      }
+    }
   },
 });
 
@@ -139,20 +156,61 @@ function changeMode(next, focusHeading = false) {
   mode = next;
   const isCards = next === 'cards';
   element('cards-view').hidden = !isCards;
-  element('sentence-view').hidden = isCards;
+  element('sentence-view').hidden = next !== 'sentence';
+  element('stories-view').hidden = next !== 'stories';
   element('cards-mode').setAttribute('aria-pressed', String(isCards));
-  element('sentence-mode').setAttribute('aria-pressed', String(!isCards));
+  element('sentence-mode').setAttribute('aria-pressed', String(next === 'sentence'));
+  element('stories-mode').setAttribute('aria-pressed', String(next === 'stories'));
   const heading = element('page-title');
-  heading.textContent = isCards ? 'Sound it out' : 'Build a sentence';
-  element('page-description').textContent = isCards
-    ? 'Choose a card, then press Hear the word to sound it out.'
-    : 'Put words together and listen to what you made.';
+  const activity = {
+    cards: ['Sound it out', 'Choose a card, then press Hear the word to sound it out.'],
+    sentence: ['Build a sentence', 'Put words together and listen to what you made.'],
+    stories: ['Short stories', 'Try reading it yourself. Then press Read slowly and follow the words.'],
+  }[next];
+  heading.textContent = activity[0];
+  element('page-description').textContent = activity[1];
   if (isCards) renderCards();
-  else renderSentence();
+  else if (next === 'sentence') renderSentence();
+  else renderStories();
   if (focusHeading) {
     heading.tabIndex = -1;
     heading.focus();
   }
+}
+
+function renderStories() {
+  const selected = story();
+  element('story-title').textContent = selected.title;
+  element('story-photo').src = selected.photo;
+  element('story-position').textContent = 'Story ' + (storyIndex + 1) + ' of ' + levelStories().length;
+  element('story-status').textContent = '';
+  const paragraphs = selected.lines.map(() => node('p'));
+  for (const [index, token] of storyTokens(selected).entries()) {
+    const target = node('span', 'story-word');
+    target.dataset.speechTarget = 'story-word-' + index;
+    target.append(node('span', 'chunk', token.text));
+    const paragraph = paragraphs[token.lineIndex];
+    if (paragraph.childNodes.length) paragraph.append(' ');
+    paragraph.append(target);
+  }
+  element('story-text').replaceChildren(...paragraphs);
+  element('story-options').replaceChildren(...levelStories().map((entry, index) => {
+    const choice = button('story-option', entry.title, () => chooseStory(index));
+    choice.setAttribute('aria-pressed', String(index === storyIndex));
+    return choice;
+  }));
+  element('previous-story').disabled = storyIndex === 0;
+  element('next-story').disabled = storyIndex === levelStories().length - 1;
+}
+
+function chooseStory(index) {
+  audio.stop();
+  storyIndex = index;
+  renderStories();
+  const title = element('story-title');
+  title.tabIndex = -1;
+  title.focus({ preventScroll: true });
+  title.scrollIntoView({ block: 'start' });
 }
 
 function setSentence(next, message, focusToken = null) {
@@ -355,6 +413,19 @@ document.addEventListener('click', event => {
 
 element('cards-mode').addEventListener('click', () => changeMode('cards'));
 element('sentence-mode').addEventListener('click', () => changeMode('sentence'));
+element('stories-mode').addEventListener('click', () => changeMode('stories'));
+element('read-story').addEventListener('click', async () => {
+  element('story-status').textContent = '';
+  if (await audio.play(storyReadingSteps(story()), 'Audio stopped. Press Read slowly to try again.')) {
+    element('story-status').textContent = 'You finished the story! Try reading it again.';
+  }
+});
+element('stop-story').addEventListener('click', () => {
+  audio.stop();
+  element('read-story').focus();
+});
+element('previous-story').addEventListener('click', () => chooseStory(storyIndex - 1));
+element('next-story').addEventListener('click', () => chooseStory(storyIndex + 1));
 element('play-word').addEventListener('click', playCard);
 element('play-sentence-word').addEventListener('click', () => {
   const token = sentence.find(item => item.id === wordToHear);
@@ -362,7 +433,7 @@ element('play-sentence-word').addEventListener('click', () => {
 });
 stopSpeech.addEventListener('click', () => {
   audio.stop();
-  element(mode === 'cards' ? 'play-word' : 'play-sentence').focus();
+  element({ cards: 'play-word', sentence: 'play-sentence', stories: 'read-story' }[mode]).focus();
 });
 element('flip-card').addEventListener('click', event => {
   const card = cardStage.firstElementChild;
@@ -426,6 +497,8 @@ levels.forEach((pack, index) => {
     levelIndex = index;
     chooseWord(0);
     renderPalette();
+    storyIndex = 0;
+    if (mode === 'stories') renderStories();
   });
   const display = node('span', '', '');
   display.append(node('span', 'level-number', String(index + 1)), document.createTextNode(pack.name));

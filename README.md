@@ -2,6 +2,8 @@
 
 A static practice app for early readers. Choose a card and press **Hear the word** to listen to its chunks and then the whole word. Flip the card to check its picture. Build sentences from an empty strip or start one from a card. Choose from action words, naming words, and sentence helpers. Every sentence choice has a picture. Helpers reuse a photo from the word packs as a contextual cue. Drag a word by its grip, or use the tap and keyboard controls.
 
+**Short stories** has eight original stories, two for each level, using the level's patterns and common helper words. Children can read first, then press **Read slowly** for Kokoro Heart narration at 78% speed with word highlighting and pauses between sentences. Every recording finishes before the next starts. Story selection is silent. Stop reading, changing levels, or switching activities cancels narration.
+
 ## Run locally
 
 Start a static server in this directory.
@@ -19,3 +21,5 @@ Isolated sounds, blends, syllables, and whole words all use bundled clips from K
 The fluent pass uses the same Kokoro Heart voice in a browser worker. Custom sentences are assembled from the app's existing word bank using the pronunciations in `sentence-phonemes.js`. The first use of **Play sentence** loads about 75 MB of model and runtime assets on demand. The browser caches the compressed model where Cache Storage is available. Card decoding and individual words use small bundled clips and work without that download. All voice work stays on the device.
 
 All fonts, photos, and isolated sounds are bundled. [Photo credits](photo-credits.html) identifies the source and license for each photo. Adding a pack word requires an explicit spelling breakdown and a photo with credits. Sentence helpers are separate from the picture-card packs.
+
+Story text and the extra vocabulary's explicit phonemes live in `stories.js`. Stories reuse card recordings for familiar words and load the additional Kokoro Heart recordings from `story-audio/`. Story playback uses those clips directly.

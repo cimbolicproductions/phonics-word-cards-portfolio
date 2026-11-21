@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#faf7ee">
   <meta name="description" content="Sound out words, flip to see their pictures, and build sentences with Phonics Word Cards.">
   <title>Phonics Word Cards</title>
-  <link rel="stylesheet" href="./styles.css?v=kokoro-3">
-  <script type="module" src="./app.js?v=kokoro-3"></script>
+  <link rel="stylesheet" href="./styles.css?v=stories-1">
+  <script type="module" src="./app.js?v=stories-1"></script>
 </head>
 <body>
   <header class="topbar">
@@ -19,6 +19,7 @@
       <nav class="mode-switch" aria-label="Activity">
         <button id="cards-mode" type="button" aria-pressed="true">Word cards</button>
         <button id="sentence-mode" type="button" aria-pressed="false">Build a sentence</button>
+        <button id="stories-mode" type="button" aria-pressed="false">Short stories</button>
       </nav>
     </div>
   </header>
@@ -103,6 +104,32 @@
             <h3 id="helper-palette-title">Sentence helpers</h3>
             <div id="helper-palette" class="word-options"></div>
           </section>
+        </div>
+      </aside>
+    </section>
+    <section id="stories-view" class="stories-layout" aria-label="Short stories" hidden>
+      <article class="story-panel" aria-labelledby="story-title">
+        <div class="story-header">
+          <img id="story-photo" class="story-photo" alt="">
+          <div>
+            <p id="story-position" class="story-position"></p>
+            <h2 id="story-title"></h2>
+          </div>
+        </div>
+        <div class="story-controls">
+          <button id="read-story" class="button primary" type="button"><span aria-hidden="true">▶</span> Read slowly</button>
+          <button id="stop-story" class="button secondary" type="button" hidden>■ Stop reading</button>
+        </div>
+        <p id="story-feedback" class="speech-feedback" role="status"></p>
+        <div id="story-text" class="story-text"></div>
+        <p id="story-status" class="story-status" role="status"></p>
+      </article>
+      <aside class="word-picker" aria-labelledby="story-picker-title">
+        <h2 id="story-picker-title">Choose a story</h2>
+        <div id="story-options" class="story-options"></div>
+        <div class="picker-nav">
+          <button id="previous-story" class="button secondary" type="button">← Previous</button>
+          <button id="next-story" class="button secondary" type="button">Next →</button>
         </div>
       </aside>
     </section>
