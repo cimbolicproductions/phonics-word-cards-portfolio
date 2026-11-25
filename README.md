@@ -4,6 +4,8 @@ A static practice app for early readers. Choose a card and press **Hear the word
 
 **Short stories** has eight original stories, two for each level, using the level's patterns and common helper words. Children can read first, then press **Read slowly** for Kokoro Heart narration at 78% speed with word highlighting and pauses between sentences. Every recording finishes before the next starts. Story selection is silent. Stop reading, changing levels, or switching activities cancels narration.
 
+[Try the live demo](https://phonics-word-cards.vercel.app/).
+
 ## Run locally
 
 Start a static server in this directory.
